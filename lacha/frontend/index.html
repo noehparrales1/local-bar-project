@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What's Happening Tonight | Discover Local Bars & Events</title>
+  <meta name="description" content="Discover what's happening at bars near you tonight. Live events, happy hours, trivia nights, and more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Top Control Bar -->
+    <header class="control-bar">
+      <div class="control-bar-container">
+        <h1 class="app-title">What's Happening Tonight</h1>
+        <div class="controls">
+          <button id="today-btn" class="control-btn" aria-label="Select date">
+            <span class="control-icon">📅</span>
+            <span id="date-display" class="control-text">Today</span>
+          </button>
+          <button id="now-btn" class="control-btn" aria-label="Select time">
+            <span class="control-icon">🕐</span>
+            <span id="time-display" class="control-text">Now</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Date Picker Modal -->
+    <div id="date-modal" class="modal" role="dialog" aria-labelledby="date-modal-title">
+      <div class="modal-content">
+        <h2 id="date-modal-title" class="modal-title">Select Date</h2>
+        <input type="date" id="date-picker" class="date-input">
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-secondary" id="date-cancel">Cancel</button>
+          <button class="modal-btn modal-btn-primary" id="date-confirm">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Time Picker Modal -->
+    <div id="time-modal" class="modal" role="dialog" aria-labelledby="time-modal-title">
+      <div class="modal-content">
+        <h2 id="time-modal-title" class="modal-title">Select Time</h2>
+        <input type="time" id="time-picker" class="time-input">
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-secondary" id="time-cancel">Cancel</button>
+          <button class="modal-btn modal-btn-primary" id="time-confirm">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Finding events near you...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error" class="error-container" style="display: none;">
+      <div class="error-content">
+        <span class="error-icon">⚠️</span>
+        <h2 class="error-title">Unable to load events</h2>
+        <p class="error-message" id="error-message"></p>
+        <button class="retry-btn" id="retry-btn">Try Again</button>
+      </div>
+    </div>
+
+    <!-- Main Feed Container -->
+    <main id="feed-container" class="feed-container" role="main">
+      <!-- Bar cards will be inserted here dynamically -->
+    </main>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="empty-state" style="display: none;">
+      <span class="empty-icon">🔍</span>
+      <h2 class="empty-title">No events found</h2>
+      <p class="empty-message">Try selecting a different date or time</p>
+    </div>
+  </div>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
