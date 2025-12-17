@@ -1,18 +1,36 @@
-import Database from 'better-sqlite3';
+import initSqlJs from 'sql.js';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = path.join(__dirname, 'data.db');
 
-const db = new Database(dbPath);
+// Initialize sql.js
+const SQL = await initSqlJs();
+
+// Load existing database or create new one
+let db;
+if (fs.existsSync(dbPath)) {
+  const buffer = fs.readFileSync(dbPath);
+  db = new SQL.Database(buffer);
+} else {
+  db = new SQL.Database();
+}
+
+// Helper to save database to file
+export const saveDatabase = () => {
+  const data = db.export();
+  const buffer = Buffer.from(data);
+  fs.writeFileSync(dbPath, buffer);
+};
 
 // Enable foreign keys
-db.pragma('foreign_keys = ON');
+db.run('PRAGMA foreign_keys = ON');
 
 // Create tables
 const createTables = () => {
-  db.exec(`
+  db.run(`
     CREATE TABLE IF NOT EXISTS bars (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -38,6 +56,7 @@ const createTables = () => {
     CREATE INDEX IF NOT EXISTS idx_bars_location ON bars(latitude, longitude);
     CREATE INDEX IF NOT EXISTS idx_events_bar ON events(bar_id);
   `);
+  saveDatabase();
 };
 
 createTables();

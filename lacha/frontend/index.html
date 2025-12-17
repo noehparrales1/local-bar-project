@@ -31,12 +31,32 @@
 
     <!-- Date Picker Modal -->
     <div id="date-modal" class="modal" role="dialog" aria-labelledby="date-modal-title">
-      <div class="modal-content">
+      <div class="modal-content calendar-modal">
         <h2 id="date-modal-title" class="modal-title">Select Date</h2>
-        <input type="date" id="date-picker" class="date-input">
+        
+        <div class="calendar-header">
+          <button class="calendar-nav-btn" id="prev-month" aria-label="Previous month">‹</button>
+          <span class="calendar-month-year" id="calendar-month-year">December 2025</span>
+          <button class="calendar-nav-btn" id="next-month" aria-label="Next month">›</button>
+        </div>
+        
+        <div class="calendar-grid">
+          <div class="calendar-weekdays">
+            <div class="calendar-weekday">Sun</div>
+            <div class="calendar-weekday">Mon</div>
+            <div class="calendar-weekday">Tue</div>
+            <div class="calendar-weekday">Wed</div>
+            <div class="calendar-weekday">Thu</div>
+            <div class="calendar-weekday">Fri</div>
+            <div class="calendar-weekday">Sat</div>
+          </div>
+          <div class="calendar-days" id="calendar-days">
+            <!-- Days will be inserted here by JavaScript -->
+          </div>
+        </div>
+        
         <div class="modal-actions">
           <button class="modal-btn modal-btn-secondary" id="date-cancel">Cancel</button>
-          <button class="modal-btn modal-btn-primary" id="date-confirm">Confirm</button>
         </div>
       </div>
     </div>

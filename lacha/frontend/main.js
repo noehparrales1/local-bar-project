@@ -45,22 +45,105 @@ function initializeControls() {
 
 // Initialize modals
 function initializeModals() {
-    // Date modal
-    const dateModal = document.getElementById('date-modal');
-    const datePicker = document.getElementById('date-picker');
-    const dateConfirm = document.getElementById('date-confirm');
-    const dateCancel = document.getElementById('date-cancel');
+    // Calendar state
+    let calendarDate = new Date();
+    let selectedDate = new Date(currentDate);
 
-    datePicker.value = currentDate;
+    // Initialize calendar
+    function renderCalendar() {
+        const year = calendarDate.getFullYear();
+        const month = calendarDate.getMonth();
 
-    dateConfirm.addEventListener('click', () => {
-        currentDate = datePicker.value;
-        updateControlDisplays();
-        closeModal('date-modal');
-        loadFeed();
+        // Update month/year display
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'];
+        document.getElementById('calendar-month-year').textContent =
+            `${monthNames[month]} ${year}`;
+
+        // Get first day of month and number of days
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startingDayOfWeek = firstDay.getDay();
+
+        // Get previous month's last days
+        const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+        const calendarDaysContainer = document.getElementById('calendar-days');
+        calendarDaysContainer.innerHTML = '';
+
+        // Add previous month's trailing days
+        for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+            const day = prevMonthLastDay - i;
+            const dayEl = createCalendarDay(day, true, new Date(year, month - 1, day));
+            calendarDaysContainer.appendChild(dayEl);
+        }
+
+        // Add current month's days
+        const today = new Date();
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const isToday = date.toDateString() === today.toDateString();
+            const isSelected = date.toDateString() === selectedDate.toDateString();
+            const dayEl = createCalendarDay(day, false, date, isToday, isSelected);
+            calendarDaysContainer.appendChild(dayEl);
+        }
+
+        // Add next month's leading days
+        const totalCells = calendarDaysContainer.children.length;
+        const remainingCells = Math.ceil(totalCells / 7) * 7 - totalCells;
+        for (let day = 1; day <= remainingCells; day++) {
+            const dayEl = createCalendarDay(day, true, new Date(year, month + 1, day));
+            calendarDaysContainer.appendChild(dayEl);
+        }
+    }
+
+    function createCalendarDay(day, isOtherMonth, date, isToday = false, isSelected = false) {
+        const dayEl = document.createElement('div');
+        dayEl.className = 'calendar-day';
+        dayEl.textContent = day;
+
+        if (isOtherMonth) {
+            dayEl.classList.add('calendar-day-other-month');
+        }
+        if (isToday) {
+            dayEl.classList.add('calendar-day-today');
+        }
+        if (isSelected) {
+            dayEl.classList.add('calendar-day-selected');
+        }
+
+        dayEl.addEventListener('click', () => {
+            selectedDate = new Date(date);
+            currentDate = formatDate(selectedDate);
+            updateControlDisplays();
+            closeModal('date-modal');
+            loadFeed();
+        });
+
+        return dayEl;
+    }
+
+    // Calendar navigation
+    document.getElementById('prev-month').addEventListener('click', () => {
+        calendarDate.setMonth(calendarDate.getMonth() - 1);
+        renderCalendar();
     });
 
-    dateCancel.addEventListener('click', () => closeModal('date-modal'));
+    document.getElementById('next-month').addEventListener('click', () => {
+        calendarDate.setMonth(calendarDate.getMonth() + 1);
+        renderCalendar();
+    });
+
+    document.getElementById('date-cancel').addEventListener('click', () => closeModal('date-modal'));
+
+    // Render initial calendar when modal opens
+    const dateModal = document.getElementById('date-modal');
+    dateModal.addEventListener('click', (e) => {
+        if (e.target === dateModal) {
+            closeModal('date-modal');
+        }
+    });
 
     // Time modal
     const timeModal = document.getElementById('time-modal');
@@ -80,13 +163,14 @@ function initializeModals() {
     timeCancel.addEventListener('click', () => closeModal('time-modal'));
 
     // Close on backdrop click
-    [dateModal, timeModal].forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal(modal.id);
-            }
-        });
+    timeModal.addEventListener('click', (e) => {
+        if (e.target === timeModal) {
+            closeModal(timeModal.id);
+        }
     });
+
+    // Store render function for later use
+    window.renderCalendar = renderCalendar;
 }
 
 // Modal utilities
@@ -96,7 +180,10 @@ function openModal(modalId) {
 
     // Set current values
     if (modalId === 'date-modal') {
-        document.getElementById('date-picker').value = currentDate;
+        // Render the calendar when opening the date modal
+        if (window.renderCalendar) {
+            window.renderCalendar();
+        }
     } else if (modalId === 'time-modal') {
         document.getElementById('time-picker').value = currentTime;
     }

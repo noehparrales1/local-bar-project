@@ -1,8 +1,8 @@
-import db from './database.js';
+import db, { saveDatabase } from './database.js';
 
 // Clear existing data
-db.exec('DELETE FROM events');
-db.exec('DELETE FROM bars');
+db.run('DELETE FROM events');
+db.run('DELETE FROM bars');
 
 // Sample bars in San Francisco
 const bars = [
@@ -187,44 +187,26 @@ const events = [
     }
 ];
 
-// Insert bars
-const insertBar = db.prepare(`
-  INSERT INTO bars (id, name, latitude, longitude, address, photo_url, source)
-  VALUES (?, ?, ?, ?, ?, ?, ?)
-`);
-
+// Insert bars using sql.js API
 for (const bar of bars) {
-    insertBar.run(
-        bar.id,
-        bar.name,
-        bar.latitude,
-        bar.longitude,
-        bar.address,
-        bar.photo_url,
-        bar.source
+    db.run(
+        `INSERT INTO bars (id, name, latitude, longitude, address, photo_url, source)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [bar.id, bar.name, bar.latitude, bar.longitude, bar.address, bar.photo_url, bar.source]
     );
 }
 
-// Insert events
-const insertEvent = db.prepare(`
-  INSERT INTO events (id, bar_id, title, description, day_of_week, start_time, end_time, tags)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-`);
-
+// Insert events using sql.js API
 for (const event of events) {
-    insertEvent.run(
-        event.id,
-        event.bar_id,
-        event.title,
-        event.description,
-        event.day_of_week,
-        event.start_time,
-        event.end_time,
-        event.tags
+    db.run(
+        `INSERT INTO events (id, bar_id, title, description, day_of_week, start_time, end_time, tags)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [event.id, event.bar_id, event.title, event.description, event.day_of_week, event.start_time, event.end_time, event.tags]
     );
 }
+
+// Save the database to file
+saveDatabase();
 
 console.log('✅ Database seeded successfully!');
 console.log(`📊 Inserted ${bars.length} bars and ${events.length} events`);
-
-db.close();

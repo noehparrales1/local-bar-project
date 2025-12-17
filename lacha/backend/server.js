@@ -1,12 +1,24 @@
 import express from 'express';
 import cors from 'cors';
-import db from './database.js';
+import db, { saveDatabase } from './database.js';
 
 const app = express();
 const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// Helper function to execute SELECT queries and return array of objects
+function query(sql, params = []) {
+    const stmt = db.prepare(sql);
+    stmt.bind(params);
+    const results = [];
+    while (stmt.step()) {
+        results.push(stmt.getAsObject());
+    }
+    stmt.free();
+    return results;
+}
 
 // Helper function to calculate distance between two coordinates (in meters)
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -93,7 +105,7 @@ app.get('/feed', (req, res) => {
         const dayOfWeek = daysOfWeek[dateObj.getDay()];
 
         // Get all bars
-        const bars = db.prepare('SELECT * FROM bars').all();
+        const bars = query('SELECT * FROM bars');
 
         // Filter bars within radius and get their events
         const barsWithEvents = bars
@@ -105,10 +117,10 @@ app.get('/feed', (req, res) => {
                 }
 
                 // Get events for this bar that match the day of week
-                const events = db.prepare(`
-          SELECT * FROM events 
-          WHERE bar_id = ? AND day_of_week LIKE ?
-        `).all(bar.id, `%${dayOfWeek}%`);
+                const events = query(
+                    'SELECT * FROM events WHERE bar_id = ? AND day_of_week LIKE ?',
+                    [bar.id, `%${dayOfWeek}%`]
+                );
 
                 // Process events to determine if active and add metadata
                 const processedEvents = events.map(event => {
@@ -181,7 +193,7 @@ app.get('/feed', (req, res) => {
 // GET /bars - Get all bars
 app.get('/bars', (req, res) => {
     try {
-        const bars = db.prepare('SELECT * FROM bars').all();
+        const bars = query('SELECT * FROM bars');
         res.json(bars);
     } catch (error) {
         console.error('Error in /bars:', error);
@@ -199,21 +211,23 @@ app.post('/events', (req, res) => {
         }
 
         const id = `evt_${Date.now()}`;
-        const insert = db.prepare(`
-      INSERT INTO events (id, bar_id, title, description, day_of_week, start_time, end_time, tags)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `);
 
-        insert.run(
-            id,
-            bar_id,
-            title,
-            description || '',
-            JSON.stringify(day_of_week),
-            start_time,
-            end_time,
-            JSON.stringify(tags)
+        db.run(
+            `INSERT INTO events (id, bar_id, title, description, day_of_week, start_time, end_time, tags)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                id,
+                bar_id,
+                title,
+                description || '',
+                JSON.stringify(day_of_week),
+                start_time,
+                end_time,
+                JSON.stringify(tags)
+            ]
         );
+
+        saveDatabase();
 
         res.status(201).json({ id, message: 'Event created successfully' });
     } catch (error) {
@@ -226,7 +240,7 @@ app.post('/events', (req, res) => {
 app.get('/events/:bar_id', (req, res) => {
     try {
         const { bar_id } = req.params;
-        const events = db.prepare('SELECT * FROM events WHERE bar_id = ?').all(bar_id);
+        const events = query('SELECT * FROM events WHERE bar_id = ?', [bar_id]);
 
         const processedEvents = events.map(event => ({
             ...event,
