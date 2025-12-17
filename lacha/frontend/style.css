@@ -3,9 +3,9 @@
    ============================================ */
 :root {
     /* Color Palette */
-    --color-primary: hsl(262, 83%, 58%);
-    --color-primary-dark: hsl(262, 83%, 48%);
-    --color-primary-light: hsl(262, 83%, 68%);
+    --color-primary: hsl(142, 71%, 45%);
+    --color-primary-dark: hsl(142, 71%, 35%);
+    --color-primary-light: hsl(142, 71%, 55%);
     --color-secondary: hsl(193, 95%, 56%);
     --color-accent: hsl(330, 85%, 60%);
 
@@ -403,8 +403,7 @@ body {
 
 .bar-card.focused {
     min-height: var(--card-focused-height);
-    border-color: var(--color-active);
-    box-shadow: 0 0 0 2px var(--color-active), var(--shadow-lg);
+    box-shadow: var(--shadow-lg);
     transform: scale(1.02);
     animation: cardExpand 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
