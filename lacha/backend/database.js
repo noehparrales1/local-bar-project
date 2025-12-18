@@ -46,15 +46,22 @@ const createTables = () => {
       bar_id TEXT NOT NULL,
       title TEXT NOT NULL,
       description TEXT,
-      day_of_week TEXT NOT NULL,
       start_time TEXT NOT NULL,
       end_time TEXT NOT NULL,
       tags TEXT NOT NULL,
       FOREIGN KEY (bar_id) REFERENCES bars(id) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS event_days (
+      event_id TEXT NOT NULL,
+      day_number INTEGER NOT NULL,
+      PRIMARY KEY (event_id, day_number),
+      FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+    );
+
     CREATE INDEX IF NOT EXISTS idx_bars_location ON bars(latitude, longitude);
     CREATE INDEX IF NOT EXISTS idx_events_bar ON events(bar_id);
+    CREATE INDEX IF NOT EXISTS idx_event_days_lookup ON event_days(day_number, event_id);
   `);
   saveDatabase();
 };
