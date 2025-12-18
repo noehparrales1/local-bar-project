@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>What's Happening Tonight | Discover Local Bars & Events</title>
-  <meta name="description" content="Discover what's happening at bars near you tonight. Live events, happy hours, trivia nights, and more.">
+  <meta name="description"
+    content="Discover what's happening at bars near you tonight. Live events, happy hours, trivia nights, and more.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
   <div id="app">
     <!-- Top Control Bar -->
@@ -17,6 +21,10 @@
       <div class="control-bar-container">
         <h1 class="app-title">What's Happening Tonight</h1>
         <div class="controls">
+          <button id="location-btn" class="control-btn" aria-label="Use my location">
+            <span class="control-icon">📍</span>
+            <span id="location-display" class="control-text">San Francisco</span>
+          </button>
           <button id="today-btn" class="control-btn" aria-label="Select date">
             <span class="control-icon">📅</span>
             <span id="date-display" class="control-text">Today</span>
@@ -33,13 +41,13 @@
     <div id="date-modal" class="modal" role="dialog" aria-labelledby="date-modal-title">
       <div class="modal-content calendar-modal">
         <h2 id="date-modal-title" class="modal-title">Select Date</h2>
-        
+
         <div class="calendar-header">
           <button class="calendar-nav-btn" id="prev-month" aria-label="Previous month">‹</button>
           <span class="calendar-month-year" id="calendar-month-year">December 2025</span>
           <button class="calendar-nav-btn" id="next-month" aria-label="Next month">›</button>
         </div>
-        
+
         <div class="calendar-grid">
           <div class="calendar-weekdays">
             <div class="calendar-weekday">Sun</div>
@@ -54,7 +62,7 @@
             <!-- Days will be inserted here by JavaScript -->
           </div>
         </div>
-        
+
         <div class="modal-actions">
           <button class="modal-btn modal-btn-secondary" id="date-cancel">Cancel</button>
         </div>
@@ -104,4 +112,5 @@
 
   <script type="module" src="/main.js"></script>
 </body>
+
 </html>
