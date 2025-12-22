@@ -421,18 +421,32 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--space-lg);
+    padding: var(--space-sm) var(--space-lg);
+    min-height: var(--card-collapsed-height);
+}
+
+.bar-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .bar-name {
     font-size: var(--font-size-xl);
     font-weight: 700;
-    margin-bottom: var(--space-xs);
+    margin: 0;
 }
 
 .bar-meta {
     font-size: var(--font-size-sm);
     color: var(--color-text-tertiary);
+    margin-top: var(--space-xs);
+}
+
+/* Hide distance in collapsed state */
+.bar-card.collapsed .bar-meta {
+    display: none;
 }
 
 .event-indicator {

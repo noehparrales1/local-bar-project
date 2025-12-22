@@ -10,6 +10,12 @@ const DEFAULT_LOCATION = {
 // State
 let currentDate = null;
 let currentTime = null;
+let userLocation = {
+    lat: DEFAULT_LOCATION.lat,
+    lng: DEFAULT_LOCATION.lng,
+    isUserLocation: false,
+    locationName: 'San Francisco'
+};
 let focusedCardIndex = 0;
 let barsData = [];
 let scrollAccumulator = 0;
@@ -21,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeControls();
     initializeModals();
     initializeScrolling();
-    loadFeed();
+    initializeGeolocation();
 });
 
 // Initialize date/time controls
@@ -31,6 +37,8 @@ function initializeControls() {
     currentTime = formatTime(now);
 
     updateControlDisplays();
+
+    document.getElementById('location-btn').addEventListener('click', requestUserLocation);
 
     document.getElementById('today-btn').addEventListener('click', () => {
         openModal('date-modal');
@@ -213,8 +221,8 @@ async function loadFeed() {
 
     try {
         const params = new URLSearchParams({
-            lat: DEFAULT_LOCATION.lat,
-            lng: DEFAULT_LOCATION.lng,
+            lat: userLocation.lat,
+            lng: userLocation.lng,
             radius: 10000,
             date: currentDate,
             time: currentTime
@@ -581,3 +589,170 @@ function formatTimeDisplay(timeStr) {
     const displayHours = hours % 12 || 12;
     return `${displayHours}:${String(minutes).padStart(2, '0')} ${period}`;
 }
+
+// ============================================
+// Geolocation Functions
+// ============================================
+
+// Get user's current location
+function getUserLocation() {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject(new Error('Geolocation not supported by your browser'));
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                resolve({
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                });
+            },
+            (error) => {
+                let errorMessage = 'Unable to get location';
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = 'Location permission denied';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = 'Location unavailable';
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = 'Location request timed out';
+                        break;
+                }
+                reject(new Error(errorMessage));
+            },
+            {
+                enableHighAccuracy: false,
+                timeout: 5000,
+                maximumAge: 300000  // 5 minutes cache
+            }
+        );
+    });
+}
+
+// Reverse geocode lat/lng to city name
+async function getCityName(lat, lng) {
+    try {
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`
+        );
+
+        if (!response.ok) {
+            throw new Error('Geocoding failed');
+        }
+
+        const data = await response.json();
+        const address = data.address;
+
+        // Try to build a nice city name
+        const city = address.city || address.town || address.village || address.suburb;
+        const state = address.state;
+
+        if (city && state) {
+            return `${city}, ${state}`;
+        } else if (city) {
+            return city;
+        } else if (state) {
+            return state;
+        } else {
+            return 'Your Location';
+        }
+    } catch (error) {
+        console.error('Error getting city name:', error);
+        return 'Your Location';
+    }
+}
+
+// Toggle location button - switches between user location and default
+async function requestUserLocation() {
+    const locationBtn = document.getElementById('location-btn');
+    const locationDisplay = document.getElementById('location-display');
+
+    // If already using user location, switch back to default
+    if (userLocation.isUserLocation) {
+        userLocation = {
+            lat: DEFAULT_LOCATION.lat,
+            lng: DEFAULT_LOCATION.lng,
+            isUserLocation: false,
+            locationName: 'San Francisco'
+        };
+
+        updateLocationDisplay();
+        console.log('📍 Switched to default location (San Francisco)');
+        loadFeed();
+        return;
+    }
+
+    // Otherwise, try to get user's location
+    locationDisplay.textContent = 'Getting location...';
+    locationBtn.disabled = true;
+
+    try {
+        const location = await getUserLocation();
+
+        // Get city name from coordinates
+        const cityName = await getCityName(location.lat, location.lng);
+
+        userLocation = {
+            ...location,
+            isUserLocation: true,
+            locationName: cityName
+        };
+
+        updateLocationDisplay();
+        console.log('📍 Using your location:', userLocation.lat, userLocation.lng);
+
+        // Reload feed with new location
+        loadFeed();
+    } catch (error) {
+        console.error('Geolocation error:', error);
+        alert(error.message + '. Using default location.');
+    } finally {
+        locationBtn.disabled = false;
+    }
+}
+
+// Initialize geolocation on page load
+async function initializeGeolocation() {
+    console.log('📍 Attempting to get your location...');
+
+    try {
+        const location = await getUserLocation();
+
+        // Get city name from coordinates
+        const cityName = await getCityName(location.lat, location.lng);
+
+        userLocation = {
+            ...location,
+            isUserLocation: true,
+            locationName: cityName
+        };
+
+        updateLocationDisplay();
+        console.log('📍 Got your location:', userLocation.lat, userLocation.lng);
+    } catch (error) {
+        console.log('📍 Using default location (San Francisco):', error.message);
+        updateLocationDisplay();
+    }
+
+    // Load feed regardless of location result
+    loadFeed();
+}
+
+// Update location display
+function updateLocationDisplay() {
+    const locationDisplay = document.getElementById('location-display');
+    locationDisplay.textContent = userLocation.locationName;
+
+    if (userLocation.isUserLocation) {
+        locationDisplay.style.fontWeight = '600';
+        locationDisplay.style.color = 'var(--color-active)';
+    } else {
+        locationDisplay.style.fontWeight = '500';
+        locationDisplay.style.color = '';
+    }
+}
+

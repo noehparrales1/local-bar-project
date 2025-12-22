@@ -1,6 +1,7 @@
 import db, { saveDatabase } from './database.js';
 
 // Clear existing data
+db.run('DELETE FROM event_days');
 db.run('DELETE FROM events');
 db.run('DELETE FROM bars');
 
@@ -59,10 +60,66 @@ const bars = [
         address: '890 Columbus Ave, San Francisco, CA',
         photo_url: 'https://images.unsplash.com/photo-1569949381669-ecf31ae8e613?w=800',
         source: 'manual'
+    },
+
+    // San Diego bars
+    {
+        id: 'bar_007',
+        name: 'Gaslamp Grind',
+        latitude: 32.7157,
+        longitude: -117.1611,
+        address: '456 Fifth Ave, San Diego, CA',
+        photo_url: 'https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=800',
+        source: 'manual'
+    },
+    {
+        id: 'bar_008',
+        name: 'North Park Social Club',
+        latitude: 32.7417,
+        longitude: -117.1297,
+        address: '3038 University Ave, San Diego, CA',
+        photo_url: 'https://images.unsplash.com/photo-1543007631-283050bb3e8c?w=800',
+        source: 'manual'
+    },
+    {
+        id: 'bar_009',
+        name: 'Pacific Beach Tavern',
+        latitude: 32.7942,
+        longitude: -117.2356,
+        address: '4150 Mission Blvd, San Diego, CA',
+        photo_url: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800',
+        source: 'manual'
+    },
+    {
+        id: 'bar_010',
+        name: 'Little Italy Lounge',
+        latitude: 32.7216,
+        longitude: -117.1692,
+        address: '1955 India St, San Diego, CA',
+        photo_url: 'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=800',
+        source: 'manual'
+    },
+    {
+        id: 'bar_011',
+        name: 'Sunset Cliffs Brewery',
+        latitude: 32.7239,
+        longitude: -117.2456,
+        address: '5083 Santa Monica Ave, San Diego, CA',
+        photo_url: 'https://images.unsplash.com/photo-1569949381669-ecf31ae8e613?w=800',
+        source: 'manual'
+    },
+    {
+        id: 'bar_012',
+        name: 'La Jolla Cove Bar',
+        latitude: 32.8508,
+        longitude: -117.2713,
+        address: '1132 Prospect St, La Jolla, CA',
+        photo_url: 'https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=800',
+        source: 'manual'
     }
 ];
 
-// Sample events
+// Sample events (now with days array instead of day_of_week)
 const events = [
     // The Golden Hour - Multiple events
     {
@@ -70,7 +127,7 @@ const events = [
         bar_id: 'bar_001',
         title: 'Happy Hour Special',
         description: '$5 cocktails and $3 beers',
-        day_of_week: JSON.stringify(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']),
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         start_time: '17:00',
         end_time: '19:00',
         tags: JSON.stringify(['happy-hour', 'drinks'])
@@ -80,7 +137,7 @@ const events = [
         bar_id: 'bar_001',
         title: 'Live Jazz',
         description: 'Local jazz ensemble performs',
-        day_of_week: JSON.stringify(['Friday', 'Saturday']),
+        days: ['Friday', 'Saturday'],
         start_time: '20:00',
         end_time: '23:00',
         tags: JSON.stringify(['live-music', 'jazz'])
@@ -92,7 +149,7 @@ const events = [
         bar_id: 'bar_002',
         title: 'Trivia Night',
         description: 'Test your knowledge, win prizes!',
-        day_of_week: JSON.stringify(['Monday']),
+        days: ['Monday'],
         start_time: '19:00',
         end_time: '21:00',
         tags: JSON.stringify(['trivia', 'games'])
@@ -102,7 +159,7 @@ const events = [
         bar_id: 'bar_002',
         title: 'DJ Night',
         description: 'Electronic and house music',
-        day_of_week: JSON.stringify(['Friday', 'Saturday']),
+        days: ['Friday', 'Saturday'],
         start_time: '21:00',
         end_time: '02:00',
         tags: JSON.stringify(['dj', 'dancing', 'nightlife'])
@@ -114,7 +171,7 @@ const events = [
         bar_id: 'bar_003',
         title: 'Whiskey Tasting',
         description: 'Sample premium whiskeys from around the world',
-        day_of_week: JSON.stringify(['Thursday']),
+        days: ['Thursday'],
         start_time: '18:00',
         end_time: '20:00',
         tags: JSON.stringify(['tasting', 'whiskey', 'premium'])
@@ -124,7 +181,7 @@ const events = [
         bar_id: 'bar_003',
         title: 'Open Mic Night',
         description: 'Showcase your talent',
-        day_of_week: JSON.stringify(['Wednesday']),
+        days: ['Wednesday'],
         start_time: '20:00',
         end_time: '23:00',
         tags: JSON.stringify(['live-music', 'open-mic'])
@@ -136,7 +193,7 @@ const events = [
         bar_id: 'bar_004',
         title: 'Sunset Happy Hour',
         description: 'Half-price appetizers and drinks',
-        day_of_week: JSON.stringify(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']),
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
         start_time: '16:30',
         end_time: '18:30',
         tags: JSON.stringify(['happy-hour', 'food', 'drinks'])
@@ -146,7 +203,7 @@ const events = [
         bar_id: 'bar_004',
         title: 'Karaoke Night',
         description: 'Sing your heart out!',
-        day_of_week: JSON.stringify(['Tuesday', 'Saturday']),
+        days: ['Tuesday', 'Saturday'],
         start_time: '21:00',
         end_time: '01:00',
         tags: JSON.stringify(['karaoke', 'entertainment'])
@@ -158,7 +215,7 @@ const events = [
         bar_id: 'bar_005',
         title: 'Drag Show Spectacular',
         description: 'Amazing performances by local queens',
-        day_of_week: JSON.stringify(['Friday', 'Saturday']),
+        days: ['Friday', 'Saturday'],
         start_time: '22:00',
         end_time: '00:30',
         tags: JSON.stringify(['drag-show', 'entertainment', 'lgbtq'])
@@ -170,7 +227,7 @@ const events = [
         bar_id: 'bar_006',
         title: 'Acoustic Sessions',
         description: 'Intimate acoustic performances',
-        day_of_week: JSON.stringify(['Thursday', 'Sunday']),
+        days: ['Thursday', 'Sunday'],
         start_time: '19:30',
         end_time: '22:00',
         tags: JSON.stringify(['live-music', 'acoustic'])
@@ -180,12 +237,158 @@ const events = [
         bar_id: 'bar_006',
         title: 'Craft Beer Monday',
         description: '$2 off all craft beers',
-        day_of_week: JSON.stringify(['Monday']),
+        days: ['Monday'],
         start_time: '17:00',
         end_time: '22:00',
         tags: JSON.stringify(['beer', 'craft-beer', 'deals'])
+    },
+
+    // San Diego Events - Gaslamp Grind
+    {
+        id: 'evt_012',
+        bar_id: 'bar_007',
+        title: 'Gaslamp Happy Hour',
+        description: '$4 well drinks and appetizers',
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        start_time: '16:00',
+        end_time: '19:00',
+        tags: JSON.stringify(['happy-hour', 'drinks', 'food'])
+    },
+    {
+        id: 'evt_013',
+        bar_id: 'bar_007',
+        title: 'Saturday Night DJ',
+        description: 'Top 40 and hip-hop with DJ Spin',
+        days: ['Friday', 'Saturday'],
+        start_time: '22:00',
+        end_time: '02:00',
+        tags: JSON.stringify(['dj', 'dancing', 'nightlife'])
+    },
+
+    // North Park Social Club
+    {
+        id: 'evt_014',
+        bar_id: 'bar_008',
+        title: 'Trivia Tuesday',
+        description: 'Weekly trivia with cash prizes',
+        days: ['Tuesday'],
+        start_time: '19:00',
+        end_time: '21:30',
+        tags: JSON.stringify(['trivia', 'games'])
+    },
+    {
+        id: 'evt_015',
+        bar_id: 'bar_008',
+        title: 'Local Band Showcase',
+        description: 'Featuring San Diego local talent',
+        days: ['Thursday', 'Saturday'],
+        start_time: '21:00',
+        end_time: '23:30',
+        tags: JSON.stringify(['live-music', 'local'])
+    },
+
+    // Pacific Beach Tavern
+    {
+        id: 'evt_016',
+        bar_id: 'bar_009',
+        title: 'Taco Tuesday',
+        description: '$2 tacos and $5 margaritas',
+        days: ['Tuesday'],
+        start_time: '17:00',
+        end_time: '22:00',
+        tags: JSON.stringify(['food', 'deals', 'mexican'])
+    },
+    {
+        id: 'evt_017',
+        bar_id: 'bar_009',
+        title: 'Beach Bonfire Nights',
+        description: 'Bonfire party on the beach',
+        days: ['Friday', 'Saturday'],
+        start_time: '20:00',
+        end_time: '23:00',
+        tags: JSON.stringify(['outdoor', 'beach', 'bonfire'])
+    },
+
+    // Little Italy Lounge
+    {
+        id: 'evt_018',
+        bar_id: 'bar_010',
+        title: 'Wine Wednesday',
+        description: 'Half-price wine bottles',
+        days: ['Wednesday'],
+        start_time: '17:00',
+        end_time: '22:00',
+        tags: JSON.stringify(['wine', 'deals'])
+    },
+    {
+        id: 'evt_019',
+        bar_id: 'bar_010',
+        title: 'Jazz Brunch',
+        description: 'Live jazz with bottomless mimosas',
+        days: ['Saturday', 'Sunday'],
+        start_time: '10:00',
+        end_time: '14:00',
+        tags: JSON.stringify(['jazz', 'brunch', 'live-music'])
+    },
+
+    // Sunset Cliffs Brewery
+    {
+        id: 'evt_020',
+        bar_id: 'bar_011',
+        title: 'Sunset Sessions',
+        description: 'Watch the sunset with craft beer',
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        start_time: '17:30',
+        end_time: '19:30',
+        tags: JSON.stringify(['craft-beer', 'sunset', 'outdoor'])
+    },
+    {
+        id: 'evt_021',
+        bar_id: 'bar_011',
+        title: 'Comedy Open Mic',
+        description: 'Aspiring comedians take the stage',
+        days: ['Wednesday'],
+        start_time: '20:00',
+        end_time: '22:30',
+        tags: JSON.stringify(['comedy', 'open-mic', 'entertainment'])
+    },
+
+    // La Jolla Cove Bar
+    {
+        id: 'evt_022',
+        bar_id: 'bar_012',
+        title: 'Rooftop Happy Hour',
+        description: 'Ocean view happy hour',
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        start_time: '16:00',
+        end_time: '18:00',
+        tags: JSON.stringify(['happy-hour', 'rooftop', 'ocean-view'])
+    },
+    {
+        id: 'evt_023',
+        bar_id: 'bar_012',
+        title: 'Sunday Funday',
+        description: 'All-day drink specials and games',
+        days: ['Sunday'],
+        start_time: '12:00',
+        end_time: '20:00',
+        tags: JSON.stringify(['drinks', 'games', 'sunday-funday'])
     }
 ];
+
+// Helper function to convert day name to number
+function dayNameToNumber(dayName) {
+    const days = {
+        'Sunday': 0,
+        'Monday': 1,
+        'Tuesday': 2,
+        'Wednesday': 3,
+        'Thursday': 4,
+        'Friday': 5,
+        'Saturday': 6
+    };
+    return days[dayName];
+}
 
 // Insert bars using sql.js API
 for (const bar of bars) {
@@ -196,13 +399,24 @@ for (const bar of bars) {
     );
 }
 
-// Insert events using sql.js API
+// Insert events and event_days using sql.js API
 for (const event of events) {
+    // Insert event (without day_of_week)
     db.run(
-        `INSERT INTO events (id, bar_id, title, description, day_of_week, start_time, end_time, tags)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [event.id, event.bar_id, event.title, event.description, event.day_of_week, event.start_time, event.end_time, event.tags]
+        `INSERT INTO events (id, bar_id, title, description, start_time, end_time, tags)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [event.id, event.bar_id, event.title, event.description, event.start_time, event.end_time, event.tags]
     );
+
+    // Insert event_days for each day this event occurs
+    for (const dayName of event.days) {
+        const dayNumber = dayNameToNumber(dayName);
+        db.run(
+            `INSERT INTO event_days (event_id, day_number)
+             VALUES (?, ?)`,
+            [event.id, dayNumber]
+        );
+    }
 }
 
 // Save the database to file
@@ -210,3 +424,4 @@ saveDatabase();
 
 console.log('✅ Database seeded successfully!');
 console.log(`📊 Inserted ${bars.length} bars and ${events.length} events`);
+console.log(`🗓️  Created ${events.reduce((sum, e) => sum + e.days.length, 0)} event-day mappings`);
