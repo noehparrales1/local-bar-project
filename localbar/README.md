@@ -28,7 +28,7 @@ A beautiful, modern web app for discovering local bars and their events happenin
 ## 📁 Project Structure
 
 ```
-lacha/
+localbar/
 ├── backend/
 │   ├── server.js         # Express API server
 │   ├── database.js       # SQLite schema & connection
