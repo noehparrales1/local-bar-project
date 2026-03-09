@@ -22,6 +22,15 @@ My contributions included:
 
 This project helped strengthen my experience in backend development, database design, API integration, and user-focused web application design.
 
+## Next Steps
+
+- Introduce authentication and role-based access control
+- Implement recommendation logic based on user behavior
+- Optimize database queries and indexing for performance at scale
+- Deploy to cloud infrastructure with CI/CD integration
+- Add real-time updates using websockets or polling
+- Develop analytics dashboards for venue engagement insights
+
 ## Features
 
 - Discover local bars and their events in a scrollable feed
